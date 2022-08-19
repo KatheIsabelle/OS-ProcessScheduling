@@ -168,4 +168,27 @@ int create_output(TaskList *list, int processorNumber, enum TypeOrder type){
         }
         aux = aux->prox;
     }
+    if (type==CRESCENT){
+        saida = fopen("MENORES_PRIMEIRO.TXT", "w");
+    }
+    else{
+        saida = fopen("MAIORES_PRIMEIRO.TXT", "w");
+    }
+    if(!saida){
+        return 1;
+    }
+    for (i=0; i<processorNumber; i++){
+        aux = TaskList_proc[i]->firstTask;
+        fprintf(saida, "%s%d\n", "Processador_", i+1);
+        for(j=0; j<(TaskList_proc[i]->taskLength); j++){
+            fprintf(saida, "%s;%d;%d\n", aux->name, aux->start, aux-end);
+            aux=aux->prox;
+        }
+        fprintf(saida,"\n");
+    }
+    fclose(saida);
+    for(i=0;i<processorNumber;i++){
+        kill_TaskList(TaskList_proc[i]);
+    }
+    return 0;
 }
