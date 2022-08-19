@@ -118,3 +118,54 @@ TaskList* read_file(char arq[], enum TypeOrder type){
 
 
 
+//CRIA OUTPUTS
+int create_output(TaskList *list, int processorNumber, enum TypeOrder type){
+    int i, j, p, verifica;
+    Task *aux, *ult, *ult2;
+    FILE *saida;
+
+    TaskList *TaskList_proc[processorNumber];
+
+    for(i = 0; i < processorNumber; i++){
+        TaskList_proc[i] = create_TaskList();
+        if (!TaskList_proc[i]) return 1;
+    }
+
+    aux = list->firstTask;
+    for (i=0; i<(list->taskLength); i++){
+        p= -1;
+        for(j=0;j<processorNumber;j++){
+            if(!TaskList_proc[j]->firstTask){
+                aux->end = aux->time;
+                p = j;
+                break;
+            }
+        }
+        if (p>=0){
+            verifica = add_task_in_TaskList(TaskList_proc[p], aux->name, aux->end, 0);
+            if(verifica)
+                return 1;
+        } else {
+            p=0;
+            for(j=0;j<processorNumber;j++){
+                ult = get_last_task_from_TaskList(TaskList_proc[j]);
+                ult2 = get_last_task_from_TaskList(TaskList_proc[p]);
+                if(ult->end < ult2->end){
+                    p=j;
+                    aux->start = ult->end;
+                    aux->end = ult->end + aux->time;
+                }else{
+                    if(ult->end == ult2->end){
+                        aux->start = ult2->end;
+                        aux->end = ult2->end + aux->time;
+                    }
+                }
+
+            }
+            verifica = add_task_in_TaskList(TaskList_proc[p], aux->name, aux->end, aux->start);
+            if(verifica)
+            return 1;
+        }
+        aux = aux->prox;
+    }
+}
